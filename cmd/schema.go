@@ -646,6 +646,6 @@ func runSchemaCopy(cmd *cobra.Command, args []string) error {
 func confirmPrompt(message string) bool {
 	fmt.Printf("%s [y/N]: ", message)
 	var answer string
-	fmt.Scanln(&answer)
-	return answer == "y" || answer == "Y" || answer == "yes" || answer == "Yes"
+	_, _ = fmt.Scanln(&answer)
+	return strings.EqualFold(answer, "y") || strings.EqualFold(answer, "yes")
 }

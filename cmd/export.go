@@ -100,7 +100,7 @@ func runExport(cmd *cobra.Command, args []string) error {
 		<-sigCh
 		fmt.Println("\nShutting down gracefully...")
 		close(stopCh)
-		server.Close()
+		_ = server.Close()
 	}()
 
 	fmt.Println("Turbopuffer Prometheus exporter running")
@@ -252,7 +252,7 @@ func handleMetrics(w http.ResponseWriter, r *http.Request) {
 	data := state.data
 	state.mu.RUnlock()
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Write([]byte(data))
+	_, _ = w.Write([]byte(data))
 }
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
@@ -264,7 +264,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	}
 	state.mu.RUnlock()
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(health)
+	_ = json.NewEncoder(w).Encode(health)
 }
 
 func handleRoot(port, interval int, allRegions bool, region string, includeRecall bool, recallInterval int) http.HandlerFunc {
@@ -290,7 +290,7 @@ func handleRoot(port, interval int, allRegions bool, region string, includeRecal
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprintf(w, `<!DOCTYPE html>
+		_, _ = fmt.Fprintf(w, `<!DOCTYPE html>
 <html>
 <head><title>Turbopuffer Prometheus Exporter</title>
 <style>body{font-family:sans-serif;max-width:800px;margin:50px auto;padding:20px}

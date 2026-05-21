@@ -45,7 +45,7 @@ func GenerateEmbedding(text, modelID string) ([]float32, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to embedding service at %s: %w\nMake sure the embedding Docker container is running:\n  docker compose -f docker/docker-compose.yml up -d", endpoint, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {

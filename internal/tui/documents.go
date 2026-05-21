@@ -34,11 +34,10 @@ type searchErrMsg struct {
 type documentsModel struct {
 	namespace    string
 	rows         []map[string]any
-	cursor       int
-	loading      bool
-	err          error
-	page         int
-	pageSize     int
+	cursor   int
+	loading  bool
+	err      error
+	pageSize int
 	schemaDict   map[string]any
 	contentField string
 

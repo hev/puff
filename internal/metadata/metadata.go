@@ -140,7 +140,7 @@ func FetchNamespaceMetadata(ctx context.Context, namespaceID, region string) *Na
 
 // FetchNamespacesWithMetadata fetches all namespaces with their metadata.
 func FetchNamespacesWithMetadata(ctx context.Context, allRegions bool, region string, includeRecall bool) []NamespaceWithMetadata {
-	var result []NamespaceWithMetadata
+	result := []NamespaceWithMetadata{}
 
 	if allRegions {
 		for _, r := range regions.TurbopufferRegions {
@@ -161,7 +161,7 @@ func FetchNamespacesWithMetadata(ctx context.Context, allRegions bool, region st
 			return nil
 		}
 		if len(nsIDs) == 0 {
-			return nil
+			return []NamespaceWithMetadata{}
 		}
 		result = fetchMetadataParallel(ctx, nsIDs, region, includeRecall)
 	}

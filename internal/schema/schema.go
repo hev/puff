@@ -263,7 +263,7 @@ func ParseVectorDims(vectorType string) int {
 		return 0
 	}
 	var dims int
-	fmt.Sscanf(vectorType[start:end], "%d", &dims)
+	_, _ = fmt.Sscanf(vectorType[start:end], "%d", &dims)
 	return dims
 }
 
@@ -409,24 +409,24 @@ func LoadSchemaFile(filePath string) (map[string]any, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("Schema file not found: %s", filePath)
+			return nil, fmt.Errorf("schema file not found: %s", filePath)
 		}
-		return nil, fmt.Errorf("Error reading schema file: %w", err)
+		return nil, fmt.Errorf("error reading schema file: %w", err)
 	}
 
 	var raw any
 	if err := json.Unmarshal(data, &raw); err != nil {
-		return nil, fmt.Errorf("Invalid JSON in schema file: %s", err)
+		return nil, fmt.Errorf("invalid JSON in schema file: %s", err)
 	}
 
 	schemaData, ok := raw.(map[string]any)
 	if !ok {
-		return nil, fmt.Errorf("Schema file must contain a JSON object")
+		return nil, fmt.Errorf("schema file must contain a JSON object")
 	}
 
 	errors := ValidateSchema(schemaData)
 	if len(errors) > 0 {
-		return nil, fmt.Errorf("Invalid schema:\n  %s", strings.Join(errors, "\n  "))
+		return nil, fmt.Errorf("invalid schema:\n  %s", strings.Join(errors, "\n  "))
 	}
 
 	return schemaData, nil

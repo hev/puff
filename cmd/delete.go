@@ -119,7 +119,7 @@ func deleteAllNamespaces(ctx context.Context, c *turbopuffer.Client) error {
 	fmt.Println()
 	fmt.Print("> ")
 	var answer string
-	fmt.Scanln(&answer)
+	_, _ = fmt.Scanln(&answer)
 
 	if answer != "yolo" {
 		fmt.Println("\nWise choice! Your data lives to see another day.")
@@ -183,9 +183,9 @@ func deleteByPrefix(ctx context.Context, c *turbopuffer.Client, prefix string) e
 	fmt.Printf("To confirm, please type the prefix: %s\n\n", prefix)
 	fmt.Print("> ")
 	var answer string
-	fmt.Scanln(&answer)
+	_, _ = fmt.Scanln(&answer)
 
-	if strings.ToLower(answer) != strings.ToLower(prefix) {
+	if !strings.EqualFold(answer, prefix) {
 		fmt.Println("\nDeletion cancelled.")
 		return nil
 	}
@@ -235,7 +235,7 @@ func deleteNamespace(ctx context.Context, ns *turbopuffer.Namespace) (*turbopuff
 func promptYN(message string) bool {
 	fmt.Printf("%s ", message)
 	var answer string
-	fmt.Scanln(&answer)
+	_, _ = fmt.Scanln(&answer)
 	answer = strings.ToLower(strings.TrimSpace(answer))
 	return answer == "y" || answer == "yes"
 }

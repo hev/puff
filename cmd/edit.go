@@ -81,9 +81,9 @@ func runEdit(cmd *cobra.Command, args []string) error {
 		os.Exit(1)
 	}
 	tmpPath := tmpFile.Name()
-	tmpFile.Write(originalContent)
-	tmpFile.Close()
-	defer os.Remove(tmpPath)
+	_, _ = tmpFile.Write(originalContent)
+	_ = tmpFile.Close()
+	defer func() { _ = os.Remove(tmpPath) }()
 
 	fmt.Println("Opening vim editor...")
 	fmt.Println("Save and quit (:wq) to upsert changes, or quit without saving (:q!) to cancel.")
