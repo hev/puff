@@ -73,8 +73,8 @@ Presentation and query settings live in CLI options, with no browser pickers:
 
 Explicit CLI options override `--app` configuration. Theme choices stored by the
 microsite do not override the app's configured appearance. The app never creates indexes
-or writes documents. Text search uses BM25; semantic search, Layer Auto routing,
-and generated answers are not enabled in this preview.
+or writes documents. Text search offers BM25 and ANN with Turbopuffer native embedding. Layer Auto
+routing and generated answers are not enabled.
 
 Date, scalar string, numeric, and boolean controls follow the live schema.
 Filter changes take effect when Search is pressed. Changing a draft cancels the pending search;
@@ -91,7 +91,7 @@ normally makes a metadata request plus one query. At most four operations run
 concurrently per local host, each with a 30-second deadline and no automatic
 SDK retries.
 
-Results are capped at 100 per request. Ranked search returns a bounded top-k;
+Results are capped at 100 per request. Ranked BM25 and ANN search returns a bounded top-k;
 browse follows a signed, request-bound ID continuation. It preserves uint64 IDs
 and resets when filters change. Pagination is not a snapshot: concurrent writes
 may change subsequent pages. Large integers in displayed rows are serialized as
@@ -152,3 +152,44 @@ binary and shared components. Live read-only checks on 2026-09-10 compared
 three-row queries against direct Turbopuffer calls for `shelf-books` (BM25 plus
 numeric filter) and `lens-commons-quality` (ordered browse), including facet
 counts and browse continuation. No datasets or credentials were saved.
+
+
+## Declarative native embedding
+
+The main search box switches between BM25 and ANN while retaining the query and
+filters. Changing mode cancels in-flight work and resets pagination; Search
+executes the new request. The host advertises `capabilities.nativeEmbedding` and
+returns source `embed` declarations and dense-vector ANN metadata at bootstrap.
+
+For a native source such as `"content":{"type":"string","full_text_search":true,
+"embed":"voyage/voyage-4"}`, puff selects `semantic: {"field":"content"}` by
+default. The model slug comes from the schema. ANN compiles to:
+
+```json
+["content", "ANN", ["Embed", "query text"]]
+```
+
+For vectors embedded before ingestion, put this in your `--app` definition:
+
+```json
+{"semantic": {"field": "vector", "model": "voyage/voyage-4"}}
+```
+
+The host compiles `["vector","ANN",["Embed","query text",{"model":"voyage/voyage-4"}]]`.
+Use the same model that produced the stored vectors. Turbopuffer validates native
+model availability and dimensions. No browser provider key, client-generated
+vector, or separate embedding service is required. The pinned Go SDK's documented
+`SetExtraFields` extension serializes the new rank expression after host validation.
+
+Bindings are validated against current metadata before every query. Missing
+fields, disabled ANN indexes, and source-model conflicts fail before retrieval.
+The browser chooses only `mode: "BM25"` or `"ANN"`; the host owns the field/model
+binding. Model or endpoint overrides in the request are rejected. An empty query
+browses by ID without embedding. ANN does not accept browse continuation tokens.
+
+Set `"semantic":{"field":""}` to disable automatic semantic binding. Older app
+definitions continue to work, and runtime clients that omit mode retain BM25.
+Older puff binaries must be rebuilt before loading a semantic app definition.
+
+Sources: [native embedding](https://turbopuffer.com/docs/embedding),
+[query rank expressions](https://turbopuffer.com/docs/query#rank_by).

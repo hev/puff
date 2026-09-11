@@ -22,17 +22,18 @@ const Protocol = 1
 const maxResults = 100
 
 type Definition struct {
-	Version      int      `json:"version"`
-	QueryField   string   `json:"queryField,omitempty"`
-	Fields       []string `json:"fields"`
-	FilterFields []string `json:"filterFields"`
-	TitleField   string   `json:"titleField,omitempty"`
-	ImageField   string   `json:"imageField,omitempty"`
-	SourceField  string   `json:"sourceField,omitempty"`
-	Layout       string   `json:"layout,omitempty"`
-	Palette      string   `json:"palette,omitempty"`
-	Appearance   string   `json:"appearance,omitempty"`
-	Limit        int      `json:"limit,omitempty"`
+	Semantic     *Semantic `json:"semantic,omitempty"`
+	Version      int       `json:"version"`
+	QueryField   string    `json:"queryField,omitempty"`
+	Fields       []string  `json:"fields"`
+	FilterFields []string  `json:"filterFields"`
+	TitleField   string    `json:"titleField,omitempty"`
+	ImageField   string    `json:"imageField,omitempty"`
+	SourceField  string    `json:"sourceField,omitempty"`
+	Layout       string    `json:"layout,omitempty"`
+	Palette      string    `json:"palette,omitempty"`
+	Appearance   string    `json:"appearance,omitempty"`
+	Limit        int       `json:"limit,omitempty"`
 }
 
 func LoadDefinition(path string) (Definition, error) {
@@ -53,10 +54,13 @@ func LoadDefinition(path string) (Definition, error) {
 }
 
 type Field struct {
-	Name       string `json:"name"`
-	Type       string `json:"type"`
-	Filterable bool   `json:"filterable"`
-	Searchable bool   `json:"searchable"`
+	Embed      *Embedding `json:"embed,omitempty"`
+	Vector     bool       `json:"vector,omitempty"`
+	ANN        bool       `json:"ann,omitempty"`
+	Name       string     `json:"name"`
+	Type       string     `json:"type"`
+	Filterable bool       `json:"filterable"`
+	Searchable bool       `json:"searchable"`
 }
 
 func parseSchema(raw string) ([]Field, error) {
@@ -70,6 +74,8 @@ func parseSchema(raw string) ([]Field, error) {
 	for name, raw := range metadata.Schema {
 		var f struct {
 			Type       string          `json:"type"`
+			Embed      json.RawMessage `json:"embed"`
+			ANN        json.RawMessage `json:"ann"`
 			Filterable *bool           `json:"filterable"`
 			FullText   json.RawMessage `json:"full_text_search"`
 			Regex      bool            `json:"regex"`
@@ -86,7 +92,12 @@ func parseSchema(raw string) ([]Field, error) {
 		if f.Filterable != nil {
 			filterable = *f.Filterable
 		}
-		fields = append(fields, Field{Name: name, Type: f.Type, Filterable: filterable && supportedScalar(f.Type), Searchable: fts && (f.Type == "string" || f.Type == "[]string")})
+		embed, err := parseEmbedding(f.Embed, f.Type)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		vector := denseVector.MatchString(f.Type)
+		fields = append(fields, Field{Name: name, Type: f.Type, Filterable: filterable && supportedScalar(f.Type), Searchable: fts && (f.Type == "string" || f.Type == "[]string"), Embed: embed, Vector: vector, ANN: vector && (len(f.ANN) == 0 || bytes.Equal(bytes.TrimSpace(f.ANN), []byte("true")))})
 	}
 	sort.Slice(fields, func(i, j int) bool { return fields[i].Name < fields[j].Name })
 	return fields, nil
@@ -110,7 +121,7 @@ func (d Definition) visibleFields(fields []Field) []Field {
 	visible := make([]Field, 0, len(fields))
 	for _, f := range fields {
 		explicit := slices.Contains(d.Fields, f.Name) || slices.Contains(d.FilterFields, f.Name) ||
-			slices.Contains([]string{d.QueryField, d.TitleField, d.ImageField, d.SourceField}, f.Name)
+			slices.Contains([]string{d.QueryField, d.TitleField, d.ImageField, d.SourceField}, f.Name) || (d.Semantic != nil && d.Semantic.Field == f.Name)
 		if !strings.HasPrefix(f.Name, "_hevlayer") || explicit {
 			visible = append(visible, f)
 		}
@@ -147,6 +158,17 @@ func (d *Definition) resolve(fields []Field, preferred string) error {
 		if f.Searchable {
 			searchable = append(searchable, f.Name)
 		}
+	}
+	if d.Semantic == nil {
+		for _, f := range fields {
+			if f.Embed != nil {
+				d.Semantic = &Semantic{Field: f.Name}
+				break
+			}
+		}
+	}
+	if _, err := d.semanticBinding(fields); err != nil {
+		return err
 	}
 	if d.QueryField == "" {
 		if byName[preferred].Searchable {
@@ -209,6 +231,7 @@ type Predicate struct {
 	Value json.RawMessage `json:"value"`
 }
 type Query struct {
+	Mode    string      `json:"mode,omitempty"`
 	Query   string      `json:"query"`
 	Field   string      `json:"field"`
 	Limit   int         `json:"limit"`

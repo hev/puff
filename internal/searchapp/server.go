@@ -171,7 +171,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.URL.Path == "/api/bootstrap" {
-		writeJSON(w, map[string]any{"protocol": Protocol, "namespace": s.namespace, "fields": fields, "app": d, "capabilities": []string{"BM25", "browse", "values"}})
+		writeJSON(w, map[string]any{"protocol": Protocol, "namespace": s.namespace, "fields": fields, "app": d, "capabilities": map[string]bool{"nativeEmbedding": true, "browse": true, "values": true}})
 		return
 	}
 	if q.Limit < 1 || q.Limit > maxResults || len(q.Query) > 8192 || len(q.After) > 8192 {
@@ -180,6 +180,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.URL.Path == "/api/values" {
 		s.values(w, ctx, q, fields, d)
+		return
+	}
+	if q.Mode != "" && q.Mode != "BM25" && q.Mode != "ANN" {
+		writeError(w, 400, "choose BM25 or ANN")
 		return
 	}
 	if q.Facet != "" {
@@ -210,17 +214,28 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			writeError(w, 400, "ranked searches do not support browse continuation")
 			return
 		}
-		found := false
-		for _, f := range fields {
-			if f.Name == q.Field && f.Searchable {
-				found = true
+		if q.Mode == "ANN" {
+			binding, err := d.semanticBinding(fields)
+			if err != nil || binding == nil {
+				writeError(w, 400, "configure a compatible semantic field and model before using ANN")
+				return
 			}
+			// The pinned SDK predates native Embed. Its documented extra-field
+			// extension carries this server-constructed, validated rank expression.
+			params.SetExtraFields(map[string]any{"rank_by": binding.rank(q.Query)})
+		} else {
+			found := false
+			for _, f := range fields {
+				if f.Name == q.Field && f.Searchable {
+					found = true
+				}
+			}
+			if !found {
+				writeError(w, 400, "choose a field with a full-text index")
+				return
+			}
+			params.RankBy = tp.NewRankByTextBM25(q.Field, q.Query)
 		}
-		if !found {
-			writeError(w, 400, "choose a field with a full-text index")
-			return
-		}
-		params.RankBy = tp.NewRankByTextBM25(q.Field, q.Query)
 	}
 	raw, err := s.backend.Query(ctx, params)
 	if err != nil {

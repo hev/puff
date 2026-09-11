@@ -8,7 +8,7 @@ parser.add_argument('--binary',type=Path,default=Path('./puff'))
 parser.add_argument('--ui-dir',type=Path)
 args=parser.parse_args()
 requests=[]
-schema={"_hevlayer_source":{"type":"string"},"body":{"type":"string","full_text_search":True},"title":{"type":"string"},"summary":{"type":"string","full_text_search":True},"category":{"type":"string"},"active":{"type":"bool"},"size":{"type":"uint"},"date":{"type":"datetime"}}
+schema={"_hevlayer_source":{"type":"string"},"body":{"type":"string","full_text_search":True,"embed":"voyage/voyage-4"},"title":{"type":"string"},"summary":{"type":"string","full_text_search":True},"category":{"type":"string"},"active":{"type":"bool"},"size":{"type":"uint"},"date":{"type":"datetime"}}
 class API(BaseHTTPRequestHandler):
  def log_message(self,*args): pass
  def reply(self, value):
@@ -65,6 +65,15 @@ try:
    assert requests[-1]['rank_by']==['body','BM25','evidence'];assert requests[-1]['top_k']==25
    assert '18446744073709551615' in page.locator('#liveRows').inner_text()
    assert '_hevlayer_source' not in requests[-1]['include_attributes']
+   page.locator('[data-retrieval=ANN]').click();search.click();page.get_by_text('Results ready',exact=True).wait_for()
+   assert requests[-1]['rank_by']==['body','ANN',['Embed','evidence']]
+   assert 'voyage/voyage-4' in page.locator('#liveMethodHint').inner_text()
+   page.locator('[data-retrieval=BM25]').click()
+   page.locator('#liveSearch input').fill('slow');search.click();page.get_by_text('Searching…',exact=True).wait_for()
+   page.locator('[data-retrieval=ANN]').click();page.wait_for_timeout(2200)
+   assert 'Search cancelled' in page.locator('#liveStatus').inner_text()
+   assert '18446744073709551615' in page.locator('#liveRows').inner_text()
+   page.locator('[data-retrieval=BM25]').click();page.locator('#liveSearch input').fill('evidence')
    page.locator('[data-edit=active]').click();page.locator('[data-boolean=false]').click();search.click();page.get_by_text('Results ready',exact=True).wait_for()
    assert requests[-1]['filters']==['active','Eq',False],requests[-1]
    page.locator('[data-edit=size]').click();page.locator('[data-range-mode=above]').click();page.locator('#numberLow').fill('18446744073709551614');search.click();page.get_by_text('Results ready',exact=True).wait_for()
@@ -97,7 +106,7 @@ try:
    assert page.locator('[data-edit=_hevlayer_source]').count()==1
    assert page.locator('html').get_attribute('data-palette')=='hev';assert page.locator('html').get_attribute('data-appearance')=='light'
    page.close()
-  schema['body'].pop('full_text_search');schema['summary'].pop('full_text_search')
+  schema['body'].pop('embed');schema['body'].pop('full_text_search');schema['summary'].pop('full_text_search')
   with app('--layout','cards') as url:
    page=browser.new_page();page.goto(url);page.locator('#liveSearch').wait_for();assert page.locator('#liveSearch input').is_disabled()
    page.locator('button[type=submit]').click();page.get_by_text('Results ready',exact=True).wait_for();assert requests[-1]['rank_by']==['id','asc']
