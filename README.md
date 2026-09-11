@@ -46,6 +46,13 @@ Running `tpuff` opens a keyboard-driven terminal UI. Browse environments,
 namespaces, documents, and schemas without leaving the terminal. Full-text
 search is built in — press `/` in the documents view to BM25 search inline.
 
+### Local search app (development preview)
+
+`tpuff serve -n my-namespace` adds a browser interface generated from the namespace
+schema. The Go host is implemented; the shared UI bundle remains private pending
+redistribution approval. See [local search apps](docs/search-app.md) for the
+`--ui-dir` development flow, supported operations, and local embedding.
+
 ### Full-text and vector search
 
 ```bash

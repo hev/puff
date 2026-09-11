@@ -1,7 +1,8 @@
 # Schema-generated search apps in tpuff
 
-Status: proposed implementation plan, 2026-09-10. Planning only; the commands
-below do not exist yet. Source inspected at `471b2a8` on `main`.
+Status: implementation started, 2026-09-10. `serve` is implemented and validated
+locally; public UI distribution and `generate app` remain pending. Original
+source inspected at `471b2a8` on `main`. See [preview status](../search-app.md).
 
 ## Outcome
 
@@ -193,8 +194,9 @@ schema failure, and responsive results using the actual bundled UI.
 
 Use authored test fixtures, not checked-in customer datasets. Live acceptance
 uses an explicitly selected namespace read-only; record aggregate outcomes, not
-credentials or document bodies. No runtime tests or live checks are claimed by
-this planning change. Future phases remain open in the repository's Beads tracker.
+credentials or document bodies. The serving implementation now has SDK integration and browser checks plus
+read-only parity runs on two live namespaces; see the preview status for details.
+Public packaging and app generation remain open in the repository's Beads tracker.
 
 Tracking: epic `tpuff-8gm`; phases 1–5 are `tpuff-8gm.1` through
 `tpuff-8gm.5`, with each phase depending on the previous one. The existing

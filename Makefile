@@ -1,4 +1,5 @@
-.PHONY: build install clean test vet lint docker help
+.PHONY: build install clean test vet lint docker help check-search-ui
+.DEFAULT_GOAL := build
 
 BINARY := tpuff
 ALIAS  := tpuf
@@ -9,6 +10,9 @@ endif
 
 DOCKER_IMAGE ?= hevmind/tpuff-exporter
 DOCKER_TAG   ?= dev
+
+check-search-ui:
+	python3 scripts/check-search-ui.py
 
 build:
 	go build -o $(BINARY) .

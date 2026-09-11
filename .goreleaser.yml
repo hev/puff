@@ -4,6 +4,7 @@ project_name: tpuff
 
 before:
   hooks:
+    - python3 scripts/check-search-ui.py
     - go mod tidy
 
 builds:
