@@ -1,5 +1,7 @@
 # Go build artifacts
 /puff
+/tpuf
+/tpuff
 /dist/
 *.test
 *.out

@@ -4,16 +4,25 @@ An unofficial Go CLI and TUI for [turbopuffer](https://turbopuffer.com).
 
 ## Install
 
-### Prebuilt binaries
+### Rename transition
 
-Download the latest release for your platform from
-[GitHub Releases](https://github.com/hev/puff/releases), extract, and move
-`puff` into your `PATH`.
+The project and command are now `puff` (formerly `tpuff`). Until the first
+renamed release is tagged, install from `main` using the command below.
+Existing release assets retain their original names.
+
+On first use, puff copies an existing `~/.tpuff/config.toml` to
+`~/.puff/config.toml` with private permissions. An existing puff configuration
+takes precedence. `PUFF_EMBEDDING_URL` replaces `TPUFF_EMBEDDING_URL`; the older
+variable remains a fallback.
+
+Future tagged releases publish prebuilt `puff` binaries to
+[GitHub Releases](https://github.com/hev/puff/releases) and the `hev/homebrew-tap`
+cask. The release workflow requires a cross-repository `HOMEBREW_TAP_TOKEN`.
 
 ### From source
 
 ```bash
-go install github.com/hev/puff@latest
+go install github.com/hev/puff@main
 ```
 
 Or clone and build:
