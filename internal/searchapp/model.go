@@ -32,6 +32,7 @@ type Definition struct {
 	Layout       string   `json:"layout,omitempty"`
 	Palette      string   `json:"palette,omitempty"`
 	Appearance   string   `json:"appearance,omitempty"`
+	Limit        int      `json:"limit,omitempty"`
 }
 
 func LoadDefinition(path string) (Definition, error) {
@@ -107,10 +108,16 @@ func (d *Definition) resolve(fields []Field, preferred string) error {
 		d.Layout = "list"
 	}
 	if d.Palette == "" {
-		d.Palette = "hev"
+		d.Palette = "turbopuffer"
 	}
 	if d.Appearance == "" {
-		d.Appearance = "light"
+		d.Appearance = "dark"
+	}
+	if d.Limit == 0 {
+		d.Limit = 25
+	}
+	if d.Limit < 1 || d.Limit > maxResults {
+		return errors.New("app limit must be between 1 and 100")
 	}
 	if !slices.Contains([]string{"list", "table", "cards"}, d.Layout) || !slices.Contains([]string{"hev", "grayscale", "turbopuffer"}, d.Palette) || !slices.Contains([]string{"light", "dark"}, d.Appearance) {
 		return errors.New("invalid layout, palette, or appearance")
@@ -126,8 +133,16 @@ func (d *Definition) resolve(fields []Field, preferred string) error {
 	if d.QueryField == "" {
 		if byName[preferred].Searchable {
 			d.QueryField = preferred
-		} else if len(searchable) == 1 {
-			d.QueryField = searchable[0]
+		} else {
+			for _, name := range []string{"content", "body", "text", "title"} {
+				if byName[name].Searchable {
+					d.QueryField = name
+					break
+				}
+			}
+			if d.QueryField == "" && len(searchable) > 0 {
+				d.QueryField = searchable[0]
+			}
 		}
 	}
 	if d.QueryField != "" && !byName[d.QueryField].Searchable {

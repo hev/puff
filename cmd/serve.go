@@ -25,6 +25,10 @@ func init() {
 	command.Flags().StringP("namespace", "n", "", "Namespace to serve (read-only)")
 	command.Flags().StringP("region", "r", "", "Override the region")
 	command.Flags().String("fts", "", "Full-text query field")
+	command.Flags().String("palette", "turbopuffer", "App palette: turbopuffer, hev, or grayscale")
+	command.Flags().String("appearance", "dark", "App appearance: dark or light")
+	command.Flags().String("layout", "list", "Result layout: list, table, or cards")
+	command.Flags().Int("limit", 25, "Results per search or browse page (1–100)")
 	command.Flags().String("app", "", "Versioned search-app.json definition")
 	command.Flags().String("ui-dir", "", "Verified shared UI runtime bundle (development)")
 	command.Flags().Int("port", 0, "Loopback port (0 selects an available port)")
@@ -50,6 +54,17 @@ func runServe(cmd *cobra.Command, _ []string) error {
 	}
 	if cmd.Flags().Changed("fts") {
 		definition.QueryField = fts
+	}
+	for name, target := range map[string]*string{"palette": &definition.Palette, "appearance": &definition.Appearance, "layout": &definition.Layout} {
+		if cmd.Flags().Changed(name) {
+			*target, _ = cmd.Flags().GetString(name)
+		}
+	}
+	if cmd.Flags().Changed("limit") {
+		definition.Limit, _ = cmd.Flags().GetInt("limit")
+		if definition.Limit < 1 || definition.Limit > 100 {
+			return errors.New("limit must be between 1 and 100")
+		}
 	}
 	assets, err := searchapp.Assets(directory)
 	if err != nil {

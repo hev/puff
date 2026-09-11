@@ -42,8 +42,12 @@ Browser-launch failure leaves the server usable at its printed URL. Machine
 output follows the CLI's existing `--output plain` convention.
 
 Choose the query field in this order: validated `--fts`, app configuration,
-compatible configured content field, then the only eligible full-text field.
-With several eligible fields and no explicit choice, show a field selector.
+compatible configured content field, then searchable content/body/text/title,
+then the first eligible full-text field alphabetically. Query field, layout,
+limit, palette, and appearance are CLI options, not browser pickers. Defaults
+are Turbopuffer dark, list layout, and 25 results. All supported filters appear
+from startup, initially unrestricted. Search submits; empty Search browses;
+Clear cancels and resets query, filters, and results.
 With none, show ordered document browsing and explain how to enable text search;
 do not mutate the namespace schema. Starting the server never scans the corpus
 or submits a search automatically. The user explicitly requests browse/results.
@@ -55,7 +59,7 @@ or submits a search automatically. The user explicitly requests browse/results.
   predicates must actually reach Turbopuffer with their original typed values.
 - List and table results with field selection, stable IDs, and source detail.
   Image cards are enabled by an explicit image mapping; generic rows work without
-  mappings. Hev/grayscale palettes and light/dark appearance use shared UI tokens.
+  mappings. Turbopuffer/hev/grayscale palettes and light/dark appearance use shared UI tokens.
 - Draft/applied query state, clear filters, loading/error/empty states,
   cancellation, and rejection of stale responses.
 - Explicit attribute projection and request limits. Unknown schema types remain

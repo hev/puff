@@ -279,3 +279,41 @@ func TestAssetManifestAndEmptySchema(t *testing.T) {
 		t.Fatal("empty schema not represented as lists", w.Body.String())
 	}
 }
+
+func TestPresentationDefaultsAndQueryFieldSelection(t *testing.T) {
+	fields, err := parseSchema(`{"schema":{"summary":{"type":"string","full_text_search":true},"body":{"type":"string","full_text_search":true},"active":{"type":"bool"}}}`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct{ name, preferred, explicit, want string }{
+		{"automatic", "", "", "body"},
+		{"configured preference", "summary", "", "summary"},
+		{"explicit override", "body", "summary", "summary"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			d := Definition{Version: 1, QueryField: tc.explicit}
+			if err := d.resolve(fields, tc.preferred); err != nil {
+				t.Fatal(err)
+			}
+			if d.QueryField != tc.want || d.Limit != 25 || d.Layout != "list" || d.Palette != "turbopuffer" || d.Appearance != "dark" {
+				t.Fatalf("unexpected defaults: %+v", d)
+			}
+			if len(d.FilterFields) != 1 || d.FilterFields[0] != "active" {
+				t.Fatalf("supported filters missing: %+v", d.FilterFields)
+			}
+		})
+	}
+	for _, limit := range []int{-1, 101} {
+		d := Definition{Version: 1, Limit: limit}
+		if err := d.resolve(fields, ""); err == nil {
+			t.Fatalf("accepted limit %d", limit)
+		}
+	}
+	d := Definition{Version: 1, Limit: 7, Palette: "hev", Appearance: "light", Layout: "table"}
+	if err := d.resolve(fields, ""); err != nil {
+		t.Fatal(err)
+	}
+	if d.Limit != 7 || d.Palette != "hev" || d.Appearance != "light" || d.Layout != "table" {
+		t.Fatalf("overrides lost: %+v", d)
+	}
+}

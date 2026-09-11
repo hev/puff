@@ -40,6 +40,7 @@ Changing repository visibility or publishing the UI is a separate decision.
 ```sh
 tpuff env add prod
 tpuff serve -n notes --fts content
+tpuff serve -n notes --palette hev --appearance light --layout table --limit 50
 tpuff serve -n notes --port 4387 --no-open
 tpuff serve -n notes --app ./search-app.json
 ```
@@ -49,14 +50,30 @@ an ephemeral session fragment; it never contains your database credential.
 Treat that URL as access to the current local session. Ctrl-C stops the server
 and cancels upstream work. Browser opening can be disabled with `--no-open`.
 
-Choose a full-text field and submit a query, or choose **Browse documents**.
+The browser has two main actions: **Search** and **Clear**. Search with an empty
+query browses documents. Clear resets the query, every filter, and the results,
+and cancels pending work without sending another query. Every supported filter
+is visible from startup and initially unrestricted; click its field to set it.
 There is no initial corpus scan or automatic search. Without a full-text index,
-browsing and attribute filters remain available. The app never creates indexes
+Search still browses documents with any selected attribute filters.
+
+Presentation and query settings live in CLI options, with no browser pickers:
+
+| Option | Default |
+| --- | --- |
+| `--palette` | `turbopuffer` (`hev` and `grayscale` also supported) |
+| `--appearance` | `dark` (`light` also supported) |
+| `--layout` | `list` (`table` and `cards` also supported) |
+| `--limit` | `25`, allowed range 1–100 |
+| `--fts` | Configured content field, then searchable `content`, `body`, `text`, or `title`, then the first searchable field alphabetically |
+
+Explicit CLI options override `--app` configuration. Theme choices stored by the
+microsite do not override the app's configured appearance. The app never creates indexes
 or writes documents. Text search uses BM25; semantic search, Layer Auto routing,
 and generated answers are not enabled in this preview.
 
 Date, scalar string, numeric, and boolean controls follow the live schema.
-Filters stay drafts until applied. Changing a draft cancels the pending search;
+Filter changes take effect when Search is pressed. Changing a draft cancels the pending search;
 previous results remain visible. Boolean false and missing values are distinct.
 64-bit integer boundaries travel as decimal strings and are validated and
 compiled on the server without passing through a JavaScript number.
@@ -91,8 +108,9 @@ select projected fields, available filters, or image/source mappings:
   "titleField": "title",
   "sourceField": "source_url",
   "layout": "list",
-  "palette": "hev",
-  "appearance": "light"
+  "palette": "turbopuffer",
+  "appearance": "dark",
+  "limit": 25
 }
 ```
 
