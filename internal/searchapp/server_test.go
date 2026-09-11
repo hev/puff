@@ -317,3 +317,54 @@ func TestPresentationDefaultsAndQueryFieldSelection(t *testing.T) {
 		t.Fatalf("overrides lost: %+v", d)
 	}
 }
+
+func TestTurbopufferHidesLayerMetadataByDefault(t *testing.T) {
+	metadata := `{"schema":{"_hevlayer_source":{"type":"string"},"_hevlayer_text":{"type":"string","full_text_search":true},"title":{"type":"string"},"my_hevlayer_note":{"type":"string"}}}`
+	for _, tc := range []struct {
+		name         string
+		definition   Definition
+		wantMetadata bool
+	}{
+		{"default palette", Definition{Version: 1}, false},
+		{"turbopuffer", Definition{Version: 1, Palette: "turbopuffer"}, false},
+		{"hev", Definition{Version: 1, Palette: "hev"}, true},
+		{"grayscale", Definition{Version: 1, Palette: "grayscale"}, true},
+		{"explicit bindings", Definition{Version: 1, Fields: []string{"title", "_hevlayer_source", "_hevlayer_text"}, FilterFields: []string{"_hevlayer_source"}, QueryField: "_hevlayer_text"}, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			b := &mockBackend{metadata: metadata, reply: `{"rows":[{"id":1,"title":"Document","_hevlayer_source":"internal","_hevlayer_text":"indexed metadata"}]}`}
+			s := fixtureHost(t, b)
+			s.definition = tc.definition
+			s.preferred = "_hevlayer_text"
+			w := request(t, s, "/api/bootstrap", `{}`)
+			mustOK(t, w)
+			var bootstrap struct {
+				Fields []Field    `json:"fields"`
+				App    Definition `json:"app"`
+			}
+			if err := json.Unmarshal(w.Body.Bytes(), &bootstrap); err != nil {
+				t.Fatal(err)
+			}
+			hasMetadata, hasUserField := false, false
+			for _, f := range bootstrap.Fields {
+				hasMetadata = hasMetadata || strings.HasPrefix(f.Name, "_hevlayer")
+				hasUserField = hasUserField || f.Name == "my_hevlayer_note"
+			}
+			if hasMetadata != tc.wantMetadata || !hasUserField {
+				t.Fatalf("unexpected visible schema: %+v", bootstrap.Fields)
+			}
+			if (bootstrap.App.QueryField == "_hevlayer_text") != tc.wantMetadata {
+				t.Fatalf("unexpected search default: %q", bootstrap.App.QueryField)
+			}
+			w = request(t, s, "/api/query", `{"limit":10}`)
+			mustOK(t, w)
+			if strings.Contains(w.Body.String(), `"_hevlayer_source"`) != tc.wantMetadata || strings.Contains(b.calls[0], `"_hevlayer_source"`) != tc.wantMetadata {
+				t.Fatalf("metadata projection mismatch: request %s, response %s", b.calls[0], w.Body.String())
+			}
+			w = request(t, s, "/api/values", `{"limit":10,"facet":"_hevlayer_source"}`)
+			if !tc.wantMetadata && w.Code != 400 {
+				t.Fatalf("hidden facet was accepted: %d", w.Code)
+			}
+		})
+	}
+}

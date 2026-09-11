@@ -100,6 +100,24 @@ func displayable(t string) bool {
 	return supportedScalar(t) || t == "uuid" || slices.Contains([]string{"[]string", "[]uint", "[]int", "[]float", "[]bool", "[]uuid", "[]datetime"}, t)
 }
 
+// Turbopuffer apps omit Layer metadata unless a binding explicitly requests it.
+// Apply this before resolving defaults so hidden fields cannot become filters,
+// displayed attributes, or the automatically selected full-text field.
+func (d Definition) visibleFields(fields []Field) []Field {
+	if d.Palette != "" && d.Palette != "turbopuffer" {
+		return fields
+	}
+	visible := make([]Field, 0, len(fields))
+	for _, f := range fields {
+		explicit := slices.Contains(d.Fields, f.Name) || slices.Contains(d.FilterFields, f.Name) ||
+			slices.Contains([]string{d.QueryField, d.TitleField, d.ImageField, d.SourceField}, f.Name)
+		if !strings.HasPrefix(f.Name, "_hevlayer") || explicit {
+			visible = append(visible, f)
+		}
+	}
+	return visible
+}
+
 func (d *Definition) resolve(fields []Field, preferred string) error {
 	if d.Version != Protocol {
 		return fmt.Errorf("app version must be %d", Protocol)

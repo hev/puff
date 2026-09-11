@@ -89,6 +89,7 @@ func (s *Server) schema(ctx context.Context) ([]Field, Definition, error) {
 		return nil, Definition{}, errors.New("upstream returned invalid schema")
 	}
 	d := s.definition
+	fields = d.visibleFields(fields)
 	if err = d.resolve(fields, s.preferred); err != nil {
 		return nil, d, err
 	}

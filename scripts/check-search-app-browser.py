@@ -8,7 +8,7 @@ parser.add_argument('--binary',type=Path,default=Path('./tpuff'))
 parser.add_argument('--ui-dir',type=Path)
 args=parser.parse_args()
 requests=[]
-schema={"body":{"type":"string","full_text_search":True},"title":{"type":"string"},"summary":{"type":"string","full_text_search":True},"category":{"type":"string"},"active":{"type":"bool"},"size":{"type":"uint"},"date":{"type":"datetime"}}
+schema={"_hevlayer_source":{"type":"string"},"body":{"type":"string","full_text_search":True},"title":{"type":"string"},"summary":{"type":"string","full_text_search":True},"category":{"type":"string"},"active":{"type":"bool"},"size":{"type":"uint"},"date":{"type":"datetime"}}
 class API(BaseHTTPRequestHandler):
  def log_message(self,*args): pass
  def reply(self, value):
@@ -22,7 +22,7 @@ class API(BaseHTTPRequestHandler):
   if q.get('aggregate_by'):self.reply({'aggregation_groups':[{'category':'Guide','count':4},{'category':'Report','count':2}]});return
   if q.get('rank_by',[None,None,None])[2:]==['slow']:
    time.sleep(2)
-  self.reply({'rows':[{'id':18446744073709551615,'title':'A source document','body':'A live result through the Go SDK','active':False,'size':18446744073709551615,'date':'2026-09-10T00:00:00Z','category':'Guide'}]})
+  self.reply({'rows':[{'_hevlayer_source':'internal metadata','id':18446744073709551615,'title':'A source document','body':'A live result through the Go SDK','active':False,'size':18446744073709551615,'date':'2026-09-10T00:00:00Z','category':'Guide'}]})
 server=ThreadingHTTPServer(('127.0.0.1',0),API);threading.Thread(target=server.serve_forever,daemon=True).start()
 env=dict(os.environ,NO_PROXY='127.0.0.1,localhost',no_proxy='127.0.0.1,localhost',TURBOPUFFER_API_KEY='test-only-fixture-key',TURBOPUFFER_BASE_URL='http://127.0.0.1:'+str(server.server_port),TURBOPUFFER_REGION='aws-us-east-1')
 command=[str(args.binary.resolve()),'serve','-n','notes','--no-open']
@@ -50,11 +50,13 @@ try:
    assert page.locator('html').get_attribute('data-appearance')=='dark'
    assert page.locator('#paletteChoice,#appearanceChoice,#liveField,#liveLayout,#liveLimit,#liveFilter,#liveApply,#liveBrowse,#liveStop').count()==0
    assert page.locator('#liveChips .live-filter').count()==5
+   assert '_hevlayer' not in page.locator('#app').text_content()
    assert page.locator('#liveSearch button').all_text_contents()==['Search','Clear']
    search=page.locator('#liveSearch button[type=submit]');clear=page.locator('#liveSearch [data-clear]')
    page.locator('#liveSearch input').fill('evidence');search.click();page.get_by_text('Results ready',exact=True).wait_for()
    assert requests[-1]['rank_by']==['body','BM25','evidence'];assert requests[-1]['top_k']==25
    assert '18446744073709551615' in page.locator('#liveRows').inner_text()
+   assert '_hevlayer_source' not in requests[-1]['include_attributes']
    page.locator('[data-edit=active]').click();page.locator('[data-boolean=false]').click();search.click();page.get_by_text('Results ready',exact=True).wait_for()
    assert requests[-1]['filters']==['active','Eq',False],requests[-1]
    page.locator('[data-edit=size]').click();page.locator('[data-range-mode=above]').click();page.locator('#numberLow').fill('18446744073709551614');search.click();page.get_by_text('Results ready',exact=True).wait_for()
@@ -62,7 +64,7 @@ try:
    page.locator('[data-edit=category]').click();page.locator('.vs-option').first.wait_for();assert 'aggregate_by' in requests[-1]
    page.locator('.vs-option').first.click();search.click();page.get_by_text('Results ready',exact=True).wait_for()
    assert ['category','In',['Guide']] in requests[-1]['filters'][1]
-   page.locator('.result-title').first.click();page.locator('dialog').wait_for();assert '18446744073709551615' in page.locator('dialog').inner_text();page.keyboard.press('Escape');page.locator('dialog').wait_for(state='detached')
+   page.locator('.result-title').first.click();page.locator('dialog').wait_for();assert '18446744073709551615' in page.locator('dialog').inner_text();assert '_hevlayer' not in page.locator('dialog').inner_text();page.keyboard.press('Escape');page.locator('dialog').wait_for(state='detached')
    page.screenshot(path='/tmp/tpuff-simple-desktop.png',full_page=True)
    page.set_viewport_size({'width':390,'height':844});assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
    page.screenshot(path='/tmp/tpuff-simple-mobile.png',full_page=True)
@@ -81,6 +83,7 @@ try:
    page=browser.new_page();page.goto(url);page.locator('#liveSearch input').fill('chosen field');page.locator('button[type=submit]').click();page.get_by_text('Results ready',exact=True).wait_for()
    assert requests[-1]['rank_by']==['summary','BM25','chosen field'];assert requests[-1]['top_k']==7
    assert page.locator('#liveRows table').count()==1
+   assert page.locator('[data-edit=_hevlayer_source]').count()==1
    assert page.locator('html').get_attribute('data-palette')=='hev';assert page.locator('html').get_attribute('data-appearance')=='light'
    page.close()
   schema['body'].pop('full_text_search');schema['summary'].pop('full_text_search')

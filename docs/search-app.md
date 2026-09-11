@@ -54,6 +54,10 @@ The browser has two main actions: **Search** and **Clear**. Search with an empty
 query browses documents. Clear resets the query, every filter, and the results,
 and cancels pending work without sending another query. Every supported filter
 is visible from startup and initially unrestricted; click its field to set it.
+The Turbopuffer palette hides `_hevlayer`-prefixed fields from the schema view,
+default filters, displayed results, and automatic search-field selection.
+Explicit `--app` bindings or `--fts` can opt a field back in. Other palettes
+retain those fields.
 There is no initial corpus scan or automatic search. Without a full-text index,
 Search still browses documents with any selected attribute filters.
 
