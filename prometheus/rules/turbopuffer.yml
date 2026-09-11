@@ -22,7 +22,7 @@ groups:
 
             Action required: Monitor indexing progress or investigate if data ingestion rate is too high.
           dashboard_url: "http://localhost:3000/d/turbopuffer-overview?var-namespace={{ $labels.namespace }}&var-region={{ $labels.region }}"
-          runbook_url: "https://github.com/hev/tpuff/blob/main/docs/runbooks/high-unindexed-bytes.md"
+          runbook_url: "https://github.com/hev/puff/blob/main/docs/runbooks/high-unindexed-bytes.md"
 
       # Critical: Namespace has >5GB unindexed data
       - alert: TurbopufferCriticalUnindexedBytes
@@ -48,7 +48,7 @@ groups:
             - Consider pausing writes if possible until indexing catches up
             - Contact Turbopuffer support if issue persists
           dashboard_url: "http://localhost:3000/d/turbopuffer-overview?var-namespace={{ $labels.namespace }}&var-region={{ $labels.region }}"
-          runbook_url: "https://github.com/hev/tpuff/blob/main/docs/runbooks/high-unindexed-bytes.md"
+          runbook_url: "https://github.com/hev/puff/blob/main/docs/runbooks/high-unindexed-bytes.md"
 
       # Warning: Index has been updating for too long
       - alert: TurbopufferIndexingStuck
@@ -127,7 +127,7 @@ groups:
         annotations:
           summary: "Turbopuffer exporter is down"
           description: |
-            The tpuff Prometheus exporter has been down for more than 5 minutes.
+            The puff Prometheus exporter has been down for more than 5 minutes.
 
             Impact: No metrics are being collected. Monitoring is blind.
 
@@ -136,7 +136,7 @@ groups:
             - Review exporter logs for errors
             - Verify TURBOPUFFER_API_KEY is set correctly
             - Check network connectivity to Turbopuffer API
-          runbook_url: "https://github.com/hev/tpuff/blob/main/DOCKER.md#troubleshooting"
+          runbook_url: "https://github.com/hev/puff/blob/main/DOCKER.md#troubleshooting"
 
       # Warning: Exporter scrapes are slow
       - alert: TurbopufferExporterSlowScrapes

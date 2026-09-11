@@ -7,8 +7,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/hev/tpuff/internal/client"
-	"github.com/hev/tpuff/internal/debug"
+	"github.com/hev/puff/internal/client"
+	"github.com/hev/puff/internal/debug"
 	"github.com/spf13/cobra"
 	"github.com/turbopuffer/turbopuffer-go"
 )
@@ -75,7 +75,7 @@ func runEdit(cmd *cobra.Command, args []string) error {
 	originalContent, _ := json.MarshalIndent(docWithoutVector, "", "  ")
 
 	// Write to temp file
-	tmpFile, err := os.CreateTemp("", "tpuff-edit-*.json")
+	tmpFile, err := os.CreateTemp("", "puff-edit-*.json")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating temp file: %s\n", err)
 		os.Exit(1)

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/hev/tpuff/internal/metadata"
+	"github.com/hev/puff/internal/metadata"
 )
 
 const namespacesRefreshInterval = 30 * time.Second

@@ -14,9 +14,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hev/tpuff/internal/client"
-	"github.com/hev/tpuff/internal/config"
-	"github.com/hev/tpuff/internal/searchapp"
+	"github.com/hev/puff/internal/client"
+	"github.com/hev/puff/internal/config"
+	"github.com/hev/puff/internal/searchapp"
 	"github.com/spf13/cobra"
 )
 

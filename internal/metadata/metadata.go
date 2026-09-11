@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hev/tpuff/internal/client"
-	"github.com/hev/tpuff/internal/debug"
-	"github.com/hev/tpuff/internal/regions"
+	"github.com/hev/puff/internal/client"
+	"github.com/hev/puff/internal/debug"
+	"github.com/hev/puff/internal/regions"
 	"github.com/turbopuffer/turbopuffer-go"
 )
 

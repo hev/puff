@@ -1,27 +1,27 @@
-# Goreleaser-compatible Dockerfile for the tpuff Prometheus exporter.
+# Goreleaser-compatible Dockerfile for the puff Prometheus exporter.
 #
-# When built via `goreleaser`, the pre-compiled linux/amd64 `tpuff` binary is
+# When built via `goreleaser`, the pre-compiled linux/amd64 `puff` binary is
 # placed in the build context by goreleaser.
 #
 # To build locally (without goreleaser):
-#   go build -o tpuff .
-#   docker build -f Dockerfile.exporter -t tpuff-exporter .
+#   go build -o puff .
+#   docker build -f Dockerfile.exporter -t puff-exporter .
 FROM alpine:3.21 AS base
 
 RUN apk add --no-cache ca-certificates tzdata wget && \
-    addgroup -S tpuff && adduser -S -G tpuff tpuff
+    addgroup -S puff && adduser -S -G puff puff
 
 WORKDIR /app
 
-COPY tpuff /usr/local/bin/tpuff
-RUN chmod +x /usr/local/bin/tpuff
+COPY puff /usr/local/bin/puff
+RUN chmod +x /usr/local/bin/puff
 
-USER tpuff
+USER puff
 
 EXPOSE 9876
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:9876/health >/dev/null || exit 1
 
-ENTRYPOINT ["/usr/local/bin/tpuff", "export"]
+ENTRYPOINT ["/usr/local/bin/puff", "export"]
 CMD ["--port", "9876", "--interval", "60"]

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/hev/tpuff/internal/config"
+	"github.com/hev/puff/internal/config"
 	"github.com/turbopuffer/turbopuffer-go"
 	"github.com/turbopuffer/turbopuffer-go/option"
 )
@@ -43,7 +43,7 @@ func GetClient(regionOverride string) (*turbopuffer.Client, error) {
 	}
 
 	if apiKey == "" {
-		return nil, fmt.Errorf("TURBOPUFFER_API_KEY not set. Set the env var or run 'tpuff env add <name>'")
+		return nil, fmt.Errorf("TURBOPUFFER_API_KEY not set. Set the env var or run 'puff env add <name>'")
 	}
 
 	if region == "" {

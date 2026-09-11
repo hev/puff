@@ -1,4 +1,4 @@
-module github.com/hev/tpuff
+module github.com/hev/puff
 
 go 1.25.6
 

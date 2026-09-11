@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Embedding service for tpuff CLI - supports Python-only embedding models
+Embedding service for puff CLI - supports Python-only embedding models
 """
 
 from flask import Flask, request, jsonify

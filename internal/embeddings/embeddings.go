@@ -27,7 +27,11 @@ type EmbedResponse struct {
 
 // GenerateEmbedding calls the Docker embedding service to generate an embedding.
 func GenerateEmbedding(text, modelID string) ([]float32, error) {
-	endpoint := os.Getenv("TPUFF_EMBEDDING_URL")
+	endpoint := os.Getenv("PUFF_EMBEDDING_URL")
+	if endpoint == "" {
+		// Accepted for compatibility with the pre-rename tpuff releases.
+		endpoint = os.Getenv("TPUFF_EMBEDDING_URL")
+	}
 	if endpoint == "" {
 		endpoint = DefaultEndpoint
 	}

@@ -4,7 +4,7 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 parser=argparse.ArgumentParser(description='Browser acceptance against an isolated Turbopuffer-shaped endpoint; no real credentials or datasets.')
-parser.add_argument('--binary',type=Path,default=Path('./tpuff'))
+parser.add_argument('--binary',type=Path,default=Path('./puff'))
 parser.add_argument('--ui-dir',type=Path)
 args=parser.parse_args()
 requests=[]
@@ -65,9 +65,9 @@ try:
    page.locator('.vs-option').first.click();search.click();page.get_by_text('Results ready',exact=True).wait_for()
    assert ['category','In',['Guide']] in requests[-1]['filters'][1]
    page.locator('.result-title').first.click();page.locator('dialog').wait_for();assert '18446744073709551615' in page.locator('dialog').inner_text();assert '_hevlayer' not in page.locator('dialog').inner_text();page.keyboard.press('Escape');page.locator('dialog').wait_for(state='detached')
-   page.screenshot(path='/tmp/tpuff-simple-desktop.png',full_page=True)
+   page.screenshot(path='/tmp/puff-simple-desktop.png',full_page=True)
    page.set_viewport_size({'width':390,'height':844});assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-   page.screenshot(path='/tmp/tpuff-simple-mobile.png',full_page=True)
+   page.screenshot(path='/tmp/puff-simple-mobile.png',full_page=True)
    with page.expect_download() as download:page.locator('summary').click();page.locator('#liveSave').click()
    data=Path(download.value.path()).read_text();assert 'test-only-fixture-key' not in data;assert json.loads(data)['limit']==25
    page.locator('#liveSearch input').fill('slow');search.click();page.get_by_text('Searching…',exact=True).wait_for();clear.click()

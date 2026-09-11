@@ -1,6 +1,6 @@
 package main
 
-import "github.com/hev/tpuff/cmd"
+import "github.com/hev/puff/cmd"
 
 func main() {
 	cmd.Execute()

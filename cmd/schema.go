@@ -8,9 +8,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hev/tpuff/internal/client"
-	"github.com/hev/tpuff/internal/output"
-	"github.com/hev/tpuff/internal/schema"
+	"github.com/hev/puff/internal/client"
+	"github.com/hev/puff/internal/output"
+	"github.com/hev/puff/internal/schema"
 	"github.com/spf13/cobra"
 	"github.com/turbopuffer/turbopuffer-go"
 	"github.com/turbopuffer/turbopuffer-go/packages/param"

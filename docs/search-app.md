@@ -1,6 +1,6 @@
 # Local search apps
 
-`tpuff serve` opens a read-only search interface for one namespace, using the
+`puff serve` opens a read-only search interface for one namespace, using the
 selected environment and the same credential/region precedence as the CLI.
 App construction makes no model calls. Database requests use your Turbopuffer
 account and its normal billing.
@@ -16,9 +16,9 @@ an explicit runtime directory:
 # In an authorized checkout of hev/search-ui:
 npm run build:runtime
 
-# In tpuff, point at that build:
-go build -o tpuff .
-./tpuff serve -n notes --ui-dir /path/to/search-ui/dist-runtime
+# In puff, point at that build:
+go build -o puff .
+./puff serve -n notes --ui-dir /path/to/search-ui/dist-runtime
 ```
 
 Node is needed to build the UI, not to run it. A maintainer can embed the
@@ -27,7 +27,7 @@ verified private build locally:
 ```sh
 python3 scripts/import-search-ui.py /path/to/search-ui/dist-runtime --private
 make build
-./tpuff serve -n notes
+./puff serve -n notes
 ```
 
 Imported assets remain gitignored. Do not force-add private assets to this
@@ -38,11 +38,11 @@ Changing repository visibility or publishing the UI is a separate decision.
 ## Using the app
 
 ```sh
-tpuff env add prod
-tpuff serve -n notes --fts content
-tpuff serve -n notes --palette hev --appearance light --layout table --limit 50
-tpuff serve -n notes --port 4387 --no-open
-tpuff serve -n notes --app ./search-app.json
+puff env add prod
+puff serve -n notes --fts content
+puff serve -n notes --palette hev --appearance light --layout table --limit 50
+puff serve -n notes --port 4387 --no-open
+puff serve -n notes --app ./search-app.json
 ```
 
 The listener is loopback-only. The printed URL authorizes the browser tab with
@@ -129,7 +129,7 @@ Invalid configured bindings fail with a repair message. The browser's refresh
 control detects schema changes and retains the visible draft while requesting
 a reload. The server independently checks current schema for every request.
 
-`tpuff generate app` is the next planned milestone and is not implemented by
+`puff generate app` is the next planned milestone and is not implemented by
 this first serving preview. See [the implementation plan](plans/schema-search-app.md).
 
 ## Validation record
@@ -138,7 +138,7 @@ Run the isolated browser check after building the binary and installing Python
 Playwright and its Chromium browser:
 
 ```sh
-python3 scripts/check-search-app-browser.py --binary ./tpuff
+python3 scripts/check-search-app-browser.py --binary ./puff
 # Add --ui-dir /path/to/search-ui/dist-runtime for a build without embedded assets.
 ```
 

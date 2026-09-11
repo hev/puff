@@ -8,16 +8,43 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-var configDir = filepath.Join(homeDir(), ".tpuff")
+var configDir = filepath.Join(homeDir(), ".puff")
 var configFile = filepath.Join(configDir, "config.toml")
+
+// Config lived in ~/.tpuff before the rename to puff. The directory holds API
+// keys, so the migration copies rather than moves: a user who downgrades, or
+// who runs both binaries during the transition, still has a working ~/.tpuff.
+var legacyConfigDir = filepath.Join(homeDir(), ".tpuff")
+var legacyConfigFile = filepath.Join(legacyConfigDir, "config.toml")
 
 func homeDir() string {
 	h, _ := os.UserHomeDir()
 	return h
 }
 
+// migrateLegacyConfig copies ~/.tpuff/config.toml to ~/.puff/config.toml when
+// the new path is absent and the old one exists. Best effort: a failure here
+// leaves the caller looking at a fresh config, which is what it would have
+// seen anyway.
+func migrateLegacyConfig() {
+	if _, err := os.Stat(configFile); err == nil {
+		return
+	}
+	data, err := os.ReadFile(legacyConfigFile)
+	if err != nil {
+		return
+	}
+	if err := os.MkdirAll(configDir, 0700); err != nil {
+		return
+	}
+	if err := os.WriteFile(configFile, data, 0600); err != nil {
+		return
+	}
+	fmt.Fprintf(os.Stderr, "puff: migrated config from %s to %s\n", legacyConfigDir, configDir)
+}
+
 type Config struct {
-	Active string                `toml:"active"`
+	Active string               `toml:"active"`
 	Envs   map[string]EnvConfig `toml:"envs"`
 }
 
@@ -40,8 +67,9 @@ func (e EnvConfig) GetContentField(namespace string) string {
 	return e.ContentField
 }
 
-// Load reads config from ~/.tpuff/config.toml. Returns empty config if not found.
+// Load reads config from ~/.puff/config.toml. Returns empty config if not found.
 func Load() Config {
+	migrateLegacyConfig()
 	cfg := Config{Envs: make(map[string]EnvConfig)}
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
 		return cfg
@@ -55,7 +83,7 @@ func Load() Config {
 	return cfg
 }
 
-// Save writes config to ~/.tpuff/config.toml with secure permissions.
+// Save writes config to ~/.puff/config.toml with secure permissions.
 func Save(cfg Config) error {
 	if err := os.MkdirAll(configDir, 0700); err != nil {
 		return err

@@ -133,7 +133,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !hmac.Equal([]byte(r.Header.Get("Authorization")), []byte("Bearer "+s.token)) {
-		writeError(w, 401, "reopen the URL printed by tpuff to authorize this tab")
+		writeError(w, 401, "reopen the URL printed by puff to authorize this tab")
 		return
 	}
 	if r.Method != http.MethodPost {

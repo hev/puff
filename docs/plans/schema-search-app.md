@@ -1,4 +1,4 @@
-# Schema-generated search apps in tpuff
+# Schema-generated search apps in puff
 
 Status: implementation started, 2026-09-10. `serve` is implemented and validated
 locally; public UI distribution and `generate app` remain pending. Original
@@ -6,14 +6,14 @@ source inspected at `471b2a8` on `main`. See [preview status](../search-app.md).
 
 ## Outcome
 
-An existing Turbopuffer user runs `tpuff serve -n notes` and gets a working
+An existing Turbopuffer user runs `puff serve -n notes` and gets a working
 search app over that namespace in their browser. App construction is
 deterministic: schema, explicit capabilities, and presentation mappings select
 the interface. It requires no LLM, model API key, Layer account, or hosted
 builder. Retrieval uses the user's configured Turbopuffer account; ordinary
 database charges still apply. No requests or model costs pass through hev.
 
-Ship local serving first. Follow with `tpuff generate app` for an editable
+Ship local serving first. Follow with `puff generate app` for an editable
 project. Both consume the same Layer UI implementation and versioned app
 definition. The hosted builder is a later consumer, outside this repo's scope.
 This work does not block the Layer 0.6 infrastructure release.
@@ -22,16 +22,16 @@ This work does not block the Layer 0.6 infrastructure release.
 
 ```sh
 # Existing setup; reuse the selected environment and credential precedence.
-tpuff env add prod
+puff env add prod
 
 # Phase 1: open a local search application.
-tpuff serve -n notes
-tpuff serve -n notes --fts content --port 4387 --no-open
-tpuff serve -n notes --app ./search-app.json
+puff serve -n notes
+puff serve -n notes --fts content --port 4387 --no-open
+puff serve -n notes --app ./search-app.json
 
 # Phase 2: generate editable source, without installing or running it.
-tpuff generate app -n notes --dir ./my-search
-tpuff generate app -n notes --app ./search-app.json --dir ./my-search
+puff generate app -n notes --dir ./my-search
+puff generate app -n notes --app ./search-app.json --dir ./my-search
 ```
 
 `-n/--namespace` is required; `-r/--region` retains the existing spelling.
@@ -91,13 +91,13 @@ the Turbopuffer path must not emit Layer Auto/HybridText, scan jobs, history, or
 `next_cursor` requests. npm names and exports are proposals until published.
 
 The current local design study is `lyr/hev-search-concept` (the `lyr-5` tmux
-session). It is fixture-driven, not a distributable package. Before tpuff can
+session). It is fixture-driven, not a distributable package. Before puff can
 ship, the UI owner must produce a public, compatible, redistributable release
 with a generic HTTP adapter, usable without the private Layer repository.
 Agree on artifact licensing and notices before bundling. Do not copy the study
-into tpuff or implement a second set of UI controls here.
+into puff or implement a second set of UI controls here.
 
-### Go host in tpuff
+### Go host in puff
 
 Add thin Cobra commands in `cmd/serve.go` and later `cmd/generate.go`.
 An `internal/searchapp` package owns configuration validation, the HTTP host,
@@ -118,7 +118,7 @@ Server-side source fetching is outside v1; URLs are not permission to fetch.
 
 Consume a pinned UI build and embed its static files with Go `embed.FS`.
 Check the generated asset bundle, version/digest manifest, and required notices
-into tpuff so a tagged `go install github.com/hev/tpuff@<tag>` also works from
+into puff so a tagged `go install github.com/hev/puff@<tag>` also works from
 the public module source with Go alone. A maintainer refresh script rebuilds or
 fetches the exact verified upstream artifact. No runtime CDN, npm install, model
 download, or update fetch is needed for serving. Node is a maintainer build tool,
@@ -202,14 +202,14 @@ credentials or document bodies. The serving implementation now has SDK integrati
 read-only parity runs on two live namespaces; see the preview status for details.
 Public packaging and app generation remain open in the repository's Beads tracker.
 
-Tracking: epic `tpuff-8gm`; phases 1–5 are `tpuff-8gm.1` through
-`tpuff-8gm.5`, with each phase depending on the previous one. The existing
-dropped-filter defect is `tpuff-0ai`. Beads is local/gitignored in this checkout;
+Tracking: epic `puff-8gm`; phases 1–5 are `puff-8gm.1` through
+`puff-8gm.5`, with each phase depending on the previous one. The existing
+dropped-filter defect is `puff-0ai`. Beads is local/gitignored in this checkout;
 the phase descriptions and acceptance criteria above are the portable record.
 
 ## References
 
-- [tpuff CLI and installation](https://github.com/hev/tpuff)
+- [puff CLI and installation](https://github.com/hev/puff)
 - [Turbopuffer namespace metadata](https://turbopuffer.com/docs/metadata)
 - [Turbopuffer query contract](https://turbopuffer.com/docs/query)
 - [Go embedded files](https://pkg.go.dev/embed)

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	debugpkg "github.com/hev/tpuff/internal/debug"
-	"github.com/hev/tpuff/internal/output"
+	debugpkg "github.com/hev/puff/internal/debug"
+	"github.com/hev/puff/internal/output"
 	"github.com/spf13/cobra"
 )
 
-// version is overridden at build time via -ldflags "-X github.com/hev/tpuff/cmd.version=x.y.z"
+// version is overridden at build time via -ldflags "-X github.com/hev/puff/cmd.version=x.y.z"
 var version = "dev"
 
 var (
@@ -18,7 +18,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "tpuff",
+	Use:   "puff",
 	Short: "CLI tool for Turbopuffer vector database",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if debugFlag {
@@ -37,7 +37,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputModeFlag, "output", "o", "", "Output format: human or plain")
 	rootCmd.Version = version
 	rootCmd.SetHelpCommand(&cobra.Command{Use: "no-help", Hidden: true})
-	rootCmd.PersistentFlags().BoolP("help", "h", false, "Help for tpuff")
+	rootCmd.PersistentFlags().BoolP("help", "h", false, "Help for puff")
 	rootCmd.Flags().StringP("region", "r", "", "Override the region")
 }
 
