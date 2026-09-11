@@ -386,3 +386,22 @@ func TestBundleDocumentationServedAsPlainText(t *testing.T) {
 		t.Fatal("documentation was not served as plain text")
 	}
 }
+
+func TestNumericValueSetsPreserveUint64Precision(t *testing.T) {
+	b := &mockBackend{metadata: schemaFixture, reply: `{"rows":[]}`}
+	s := fixtureHost(t, b)
+	w := request(t, s, "/api/query", `{"limit":10,"filters":[{"field":"size","op":"In","value":["18446744073709551614","18446744073709551615"]}]}`)
+	mustOK(t, w)
+	if !strings.Contains(b.calls[0], `["size","In",[18446744073709551614,18446744073709551615]]`) {
+		t.Fatal("numeric set lost precision", b.calls[0])
+	}
+	for _, values := range []string{`["18446744073709551616"]`, `[null]`, `[true]`, `[]`} {
+		w := request(t, s, "/api/query", `{"limit":10,"filters":[{"field":"size","op":"In","value":`+values+`}]}`)
+		if w.Code != 400 {
+			t.Fatalf("accepted invalid set %s", values)
+		}
+	}
+	if len(b.calls) != 1 {
+		t.Fatal("invalid numeric set reached upstream")
+	}
+}

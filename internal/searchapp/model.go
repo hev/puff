@@ -301,9 +301,17 @@ func compileFilters(predicates []Predicate, fields []Field, allowed []string, sk
 			return nil, fmt.Errorf("filter field %q is absent or unsupported", p.Field)
 		}
 		if p.Op == "In" {
-			var values []string
-			if f.Type != "string" || json.Unmarshal(p.Value, &values) != nil || len(values) == 0 || len(values) > 100 {
-				return nil, errors.New("in filter requires 1–100 string values")
+			var rawValues []json.RawMessage
+			if (f.Type != "string" && !numeric(f.Type)) || json.Unmarshal(p.Value, &rawValues) != nil || len(rawValues) == 0 || len(rawValues) > 100 {
+				return nil, errors.New("in filter requires 1–100 string or numeric values matching the field type")
+			}
+			values := make([]any, 0, len(rawValues))
+			for _, raw := range rawValues {
+				value, err := filterValue(raw, f.Type)
+				if err != nil || value == nil {
+					return nil, fmt.Errorf("invalid in value for %q", p.Field)
+				}
+				values = append(values, value)
 			}
 			if p.Field != skip {
 				filters = append(filters, tp.NewFilterIn(p.Field, values))

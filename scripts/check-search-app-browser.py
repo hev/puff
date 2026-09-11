@@ -44,6 +44,14 @@ try:
   with app() as url:
    page=browser.new_page(viewport={'width':1280,'height':950});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.add_init_script("localStorage.setItem('hevlayer-ui-theme-v1', JSON.stringify({palette:'hev',appearance:'light'}))")
+   # Exercise a host-supplied presentation hint without inferring data statistics.
+   def with_numeric_choices(route):
+    response=route.fetch();body=response.json()
+    size=next(f for f in body['fields'] if f['name']=='size')
+    size['ui']={'numberPresentation':'choices'}
+    size['profile']={'enumeration':'complete','values':['18446744073709551615']}
+    route.fulfill(response=response,json=body)
+   page.route('**/api/bootstrap',with_numeric_choices)
    page.goto(url);page.locator('#liveChips .live-filter').first.wait_for();assert requests==[],requests
    assert '#session=' not in page.url
    assert page.locator('html').get_attribute('data-palette')=='turbopuffer'
@@ -61,6 +69,9 @@ try:
    assert requests[-1]['filters']==['active','Eq',False],requests[-1]
    page.locator('[data-edit=size]').click();page.locator('[data-range-mode=above]').click();page.locator('#numberLow').fill('18446744073709551614');search.click();page.get_by_text('Results ready',exact=True).wait_for()
    assert ['size','Gte',18446744073709551614] in requests[-1]['filters'][1],requests[-1]
+   page.locator('[data-edit=size]').click();page.locator('[data-range-mode=set]').click()
+   page.locator('.nr-exact-input').fill('18446744073709551615');page.locator('[data-number-add]').click();search.click();page.get_by_text('Results ready',exact=True).wait_for()
+   assert ['size','In',[18446744073709551615]] in requests[-1]['filters'][1],requests[-1]
    page.locator('[data-edit=category]').click();page.locator('.vs-option').first.wait_for();assert 'aggregate_by' in requests[-1]
    page.locator('.vs-option').first.click();search.click();page.get_by_text('Results ready',exact=True).wait_for()
    assert ['category','In',['Guide']] in requests[-1]['filters'][1]
