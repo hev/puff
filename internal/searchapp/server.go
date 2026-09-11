@@ -64,7 +64,7 @@ func New(backend Backend, assets fs.FS, namespace string, definition Definition,
 		return nil, errors.New("namespace is required")
 	}
 	if _, err := fs.Stat(assets, "index.html"); err != nil {
-		return nil, errors.New("search UI bundle is missing; supply --ui-dir with a built search-ui runtime")
+		return nil, errors.New("search UI bundle is missing; supply --ui-dir with a built layer-ui runtime")
 	}
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
@@ -128,6 +128,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		if strings.HasSuffix(name, ".mjs") {
 			w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+		}
+		if strings.HasSuffix(name, ".md") {
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		}
 		http.ServeContent(w, r, name, time.Time{}, bytes.NewReader(body))
 		return

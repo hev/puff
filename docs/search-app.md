@@ -8,30 +8,30 @@ account and its normal billing.
 ## Development preview
 
 The Go integration is implemented. The shared UI is currently a private
-`hev/search-ui` development artifact; it is not bundled in public source yet.
+`hev/layer-ui` development artifact; it is not bundled in public source yet.
 Until that artifact is approved for redistribution, public source builds need
 an explicit runtime directory:
 
 ```sh
-# In an authorized checkout of hev/search-ui:
+# In an authorized checkout of hev/layer-ui:
 npm run build:runtime
 
 # In puff, point at that build:
 go build -o puff .
-./puff serve -n notes --ui-dir /path/to/search-ui/dist-runtime
+./puff serve -n notes --ui-dir /path/to/layer-ui/dist-runtime
 ```
 
 Node is needed to build the UI, not to run it. A maintainer can embed the
 verified private build locally:
 
 ```sh
-python3 scripts/import-search-ui.py /path/to/search-ui/dist-runtime --private
+python3 scripts/import-layer-ui.py /path/to/layer-ui/dist-runtime --private
 make build
 ./puff serve -n notes
 ```
 
 Imported assets remain gitignored. Do not force-add private assets to this
-public repository. `make check-search-ui` and GoReleaser block release until
+public repository. `make check-layer-ui` and GoReleaser block release until
 an approved artifact with recorded licensing and verified digests is included.
 Changing repository visibility or publishing the UI is a separate decision.
 
@@ -139,7 +139,7 @@ Playwright and its Chromium browser:
 
 ```sh
 python3 scripts/check-search-app-browser.py --binary ./puff
-# Add --ui-dir /path/to/search-ui/dist-runtime for a build without embedded assets.
+# Add --ui-dir /path/to/layer-ui/dist-runtime for a build without embedded assets.
 ```
 
 The check uses a local fixture endpoint with a fake credential and performs no

@@ -368,3 +368,21 @@ func TestTurbopufferHidesLayerMetadataByDefault(t *testing.T) {
 		})
 	}
 }
+
+func TestBundleDocumentationServedAsPlainText(t *testing.T) {
+	data := []byte("<script>not executable</script>")
+	sum := sha256.Sum256(data)
+	manifest, _ := json.Marshal(Manifest{Protocol: 1, Version: "test", Files: map[string]string{"index.html": hex.EncodeToString(sum[:]), "docs/runtime.md": hex.EncodeToString(sum[:])}})
+	assets, err := VerifyAssets(fstest.MapFS{"manifest.json": {Data: manifest}, "index.html": {Data: data}, "docs/runtime.md": {Data: data}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := fixtureHost(t, &mockBackend{})
+	s.assets = assets
+	w := httptest.NewRecorder()
+	s.ServeHTTP(w, httptest.NewRequest("GET", s.origin+"/docs/runtime.md", nil))
+	mustOK(t, w)
+	if w.Header().Get("Content-Type") != "text/plain; charset=utf-8" || w.Body.String() != string(data) {
+		t.Fatal("documentation was not served as plain text")
+	}
+}

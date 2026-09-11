@@ -46,7 +46,7 @@ func Assets(directory string) (fs.FS, error) {
 func VerifyAssets(source fs.FS) (fs.FS, error) {
 	raw, err := fs.ReadFile(source, "manifest.json")
 	if err != nil {
-		return nil, errors.New("search UI bundle unavailable; build hev/search-ui's runtime and supply --ui-dir")
+		return nil, errors.New("search UI bundle unavailable; build hev/layer-ui's runtime and supply --ui-dir")
 	}
 	var manifest Manifest
 	if len(raw) > 64<<10 || json.Unmarshal(raw, &manifest) != nil || manifest.Protocol != Protocol || manifest.Version == "" || len(manifest.Files) > 100 {
@@ -58,7 +58,7 @@ func VerifyAssets(source fs.FS) (fs.FS, error) {
 	result := memoryFS{}
 	total := 0
 	for name, want := range manifest.Files {
-		if !fs.ValidPath(name) || strings.HasPrefix(name, ".") || strings.Contains(name, "/.") || !strings.Contains(" .html .js .mjs .css .txt ", " "+path.Ext(name)+" ") {
+		if !fs.ValidPath(name) || strings.HasPrefix(name, ".") || strings.Contains(name, "/.") || !strings.Contains(" .html .js .mjs .css .txt .md ", " "+path.Ext(name)+" ") {
 			return nil, fmt.Errorf("invalid UI asset %q", name)
 		}
 		info, err := fs.Stat(source, name)

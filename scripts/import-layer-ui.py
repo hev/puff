@@ -23,7 +23,7 @@ for name, checksum in files.items():
     if name == 'NOTICE.txt':
         parser.error('upstream must use a distinct notice filename')
     relative = Path(name)
-    if relative.is_absolute() or any(p in ('..', '.') or p.startswith('.') for p in relative.parts) or relative.suffix not in ('.html', '.js', '.mjs', '.css', '.txt'):
+    if relative.is_absolute() or any(p in ('..', '.') or p.startswith('.') for p in relative.parts) or relative.suffix not in ('.html', '.js', '.mjs', '.css', '.txt', '.md'):
         parser.error('invalid asset path')
     data = (args.bundle / relative).read_bytes()
     if len(data) > 5 * 1024 * 1024 or hashlib.sha256(data).hexdigest() != checksum:
