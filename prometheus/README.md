@@ -465,7 +465,7 @@ See `DOCKER.md` for a full monitoring stack including Alertmanager.
 ## Support
 
 For issues with:
-- **Alert rules**: File an issue in the tpuff repository
+- **Alert rules**: File an issue in the puff repository
 - **Prometheus**: See [Prometheus documentation](https://prometheus.io/docs/alerting/latest/overview/)
 - **Alertmanager**: See [Alertmanager documentation](https://prometheus.io/docs/alerting/latest/alertmanager/)
 - **Turbopuffer**: Contact Turbopuffer support

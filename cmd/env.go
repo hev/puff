@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/hev/tpuff/internal/config"
-	"github.com/hev/tpuff/internal/output"
-	"github.com/hev/tpuff/internal/regions"
+	"github.com/hev/puff/internal/config"
+	"github.com/hev/puff/internal/output"
+	"github.com/hev/puff/internal/regions"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ var activeMarkerStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color
 
 var envCmd = &cobra.Command{
 	Use:   "env",
-	Short: "Manage tpuff environments",
+	Short: "Manage puff environments",
 }
 
 var envAddCmd = &cobra.Command{
@@ -136,7 +136,7 @@ func runEnvUse(cmd *cobra.Command, args []string) error {
 func runEnvList(cmd *cobra.Command, args []string) error {
 	envs := config.ListEnvs()
 	if len(envs) == 0 {
-		fmt.Println("No environments configured. Run 'tpuff env add <name>' to add one.")
+		fmt.Println("No environments configured. Run 'puff env add <name>' to add one.")
 		return nil
 	}
 
@@ -180,7 +180,7 @@ func runEnvRm(cmd *cobra.Command, args []string) error {
 func runEnvShow(cmd *cobra.Command, args []string) error {
 	name, env, ok := config.GetActiveEnv()
 	if !ok {
-		fmt.Println("No active environment. Run 'tpuff env add <name>' to add one.")
+		fmt.Println("No active environment. Run 'puff env add <name>' to add one.")
 		return nil
 	}
 

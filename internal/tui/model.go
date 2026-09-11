@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/hev/tpuff/internal/client"
-	"github.com/hev/tpuff/internal/config"
+	"github.com/hev/puff/internal/client"
+	"github.com/hev/puff/internal/config"
 )
 
 type view int

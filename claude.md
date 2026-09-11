@@ -1,6 +1,6 @@
 # Turbopuffer CLI - Future Features
 
-This document tracks planned features and improvements for the tpuff CLI.
+This document tracks planned features and improvements for the puff CLI.
 
 ## Commands to Implement
 
@@ -49,7 +49,7 @@ This document tracks planned features and improvements for the tpuff CLI.
 - [ ] Add unit tests
 - [ ] Add integration tests
 - [ ] Create detailed documentation
-- [ ] Add configuration file support (.tpuffrc)
+- [ ] Add configuration file support (.puffrc)
 - [ ] Implement retry logic for API calls
 - [ ] Add progress indicators for long-running operations
 - [ ] Support multiple output formats (JSON, YAML, CSV, table)

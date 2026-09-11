@@ -1,41 +1,58 @@
 version: 2
 
-project_name: tpuff
+project_name: puff
 
 before:
   hooks:
     - go mod tidy
 
 builds:
-  - id: tpuff
+  - id: puff
     main: .
-    binary: tpuff
+    binary: puff
     env:
       - CGO_ENABLED=0
     flags:
       - -trimpath
     ldflags:
-      - -s -w -X github.com/hev/tpuff/cmd.version={{.Version}}
+      - -s -w -X github.com/hev/puff/cmd.version={{.Version}}
     goos: [linux, darwin]
     goarch: [amd64, arm64]
 
 archives:
-  - id: tpuff
-    builds: [tpuff]
-    name_template: "tpuff_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - id: puff
+    ids: [puff]
+    name_template: "puff_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     files:
       - README.md
       - LICENSE
       - monitoring.md
 
+# Casks, not `brews`: the brews block is deprecated as of GoReleaser v2.10, and
+# since Homebrew/brew#19121 casks cover Linux too, so this serves every build
+# in the matrix above.
+homebrew_casks:
+  - name: puff
+    binaries: [puff]
+    repository:
+      owner: hev
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    commit_author:
+      name: hev
+      email: adam.hevenor@gmail.com
+    homepage: "https://github.com/hev/puff"
+    description: "Browse, search and export turbopuffer namespaces from the terminal"
+    license: "MIT"
+
 checksum:
   name_template: "checksums.txt"
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
@@ -52,13 +69,13 @@ changelog:
 release:
   github:
     owner: hev
-    name: tpuff
+    name: puff
   prerelease: auto
   draft: false
   header: |
-    ## tpuff {{ .Version }}
+    ## puff {{ .Version }}
 
-    Install with `go install github.com/hev/tpuff@{{ .Tag }}`, or download a
+    Install with `go install github.com/hev/puff@{{ .Tag }}`, or download a
     prebuilt binary below.
   footer: |
-    **Full changelog**: https://github.com/hev/tpuff/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full changelog**: https://github.com/hev/puff/compare/{{ .PreviousTag }}...{{ .Tag }}

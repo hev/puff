@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/hev/tpuff/internal/client"
-	"github.com/hev/tpuff/internal/debug"
-	"github.com/hev/tpuff/internal/embeddings"
-	"github.com/hev/tpuff/internal/output"
+	"github.com/hev/puff/internal/client"
+	"github.com/hev/puff/internal/debug"
+	"github.com/hev/puff/internal/embeddings"
+	"github.com/hev/puff/internal/output"
 	"github.com/spf13/cobra"
 	"github.com/turbopuffer/turbopuffer-go"
 )
