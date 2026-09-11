@@ -205,7 +205,7 @@ func TestLoadSchemaFile(t *testing.T) {
 
 		_, err := LoadSchemaFile(path)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "Invalid JSON")
+		assert.Contains(t, err.Error(), "invalid JSON")
 	})
 
 	t.Run("not an object", func(t *testing.T) {
@@ -236,6 +236,6 @@ func TestLoadSchemaFile(t *testing.T) {
 
 		_, err := LoadSchemaFile(path)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "Invalid schema")
+		assert.Contains(t, err.Error(), "invalid schema")
 	})
 }

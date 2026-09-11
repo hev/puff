@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/hev/tpuff/internal/client"
+	"github.com/hev/puff/internal/client"
 	"github.com/turbopuffer/turbopuffer-go"
 )
 

@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hev/tpuff/internal/debug"
-	"github.com/hev/tpuff/internal/metadata"
-	"github.com/hev/tpuff/internal/metrics"
+	"github.com/hev/puff/internal/debug"
+	"github.com/hev/puff/internal/metadata"
+	"github.com/hev/puff/internal/metrics"
 	"github.com/spf13/cobra"
 )
 

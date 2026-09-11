@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/hev/tpuff/internal/config"
+	"github.com/hev/puff/internal/config"
 )
 
 type envsModel struct {
@@ -71,7 +71,7 @@ func (m envsModel) view(width, height int) string {
 	b.WriteString("\n\n")
 
 	if len(m.entries) == 0 {
-		b.WriteString("No environments configured. Run 'tpuff env add <name>' to add one.\n\n")
+		b.WriteString("No environments configured. Run 'puff env add <name>' to add one.\n\n")
 		b.WriteString(helpStyle.Render("q quit"))
 		return b.String()
 	}

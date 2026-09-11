@@ -10,10 +10,10 @@ Run the exporter using Docker:
 
 ```bash
 docker run -d \
-  --name tpuff-exporter \
+  --name puff-exporter \
   -p 9876:9876 \
   -e TURBOPUFFER_API_KEY=your_api_key \
-  hevmind/tpuff-exporter:latest \
+  hevmind/puff-exporter:latest \
   --region aws-us-east-1
 ```
 
@@ -87,8 +87,8 @@ For a complete monitoring stack (Exporter + Prometheus + Grafana):
 version: '3.8'
 
 services:
-  tpuff-exporter:
-    image: hevmind/tpuff-exporter:latest
+  puff-exporter:
+    image: hevmind/puff-exporter:latest
     ports:
       - "9876:9876"
     environment:
@@ -126,14 +126,14 @@ services:
 
 ## Building from Source
 
-The exporter is just `tpuff export`. You can either run it directly or build
+The exporter is just `puff export`. You can either run it directly or build
 the Docker image.
 
 **Directly:**
 
 ```bash
-go install github.com/hev/tpuff@latest
-tpuff export --region aws-us-east-1
+go install github.com/hev/puff@latest
+puff export --region aws-us-east-1
 ```
 
 **Docker image (local):**
@@ -142,12 +142,12 @@ The shipped `Dockerfile.exporter` expects a pre-built binary in the build
 context — `make docker` handles this for you:
 
 ```bash
-make docker                          # builds hevmind/tpuff-exporter:dev
+make docker                          # builds hevmind/puff-exporter:dev
 docker run -d \
-  --name tpuff-exporter \
+  --name puff-exporter \
   -p 9876:9876 \
   -e TURBOPUFFER_API_KEY=your_api_key \
-  hevmind/tpuff-exporter:dev
+  hevmind/puff-exporter:dev
 ```
 
 Release images are pushed manually to Docker Hub by maintainers using

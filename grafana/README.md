@@ -1,6 +1,6 @@
 # Turbopuffer Grafana Dashboard
 
-This directory contains a Grafana dashboard for monitoring Turbopuffer namespace metrics collected by the tpuff Prometheus exporter.
+This directory contains a Grafana dashboard for monitoring Turbopuffer namespace metrics collected by the puff Prometheus exporter.
 
 ## Overview
 
@@ -25,12 +25,12 @@ The **Turbopuffer Overview** dashboard provides comprehensive monitoring of your
 Before importing this dashboard, ensure you have:
 
 1. **Grafana 9.x or 10.x** installed and running
-2. **Prometheus** configured and scraping the tpuff exporter (see below)
-3. **tpuff-exporter** running and exposing metrics on port 9876 (or your configured port)
+2. **Prometheus** configured and scraping the puff exporter (see below)
+3. **puff-exporter** running and exposing metrics on port 9876 (or your configured port)
 
 ### Prometheus Configuration
 
-Add the tpuff exporter as a scrape target in your `prometheus.yml`:
+Add the puff exporter as a scrape target in your `prometheus.yml`:
 
 ```yaml
 scrape_configs:
@@ -92,7 +92,7 @@ The dashboard will automatically appear in Grafana under the "Turbopuffer" folde
 
 ### Option 3: Docker Compose
 
-See the root `DOCKER.md` file for a complete monitoring stack example with Prometheus, Grafana, and tpuff-exporter.
+See the root `DOCKER.md` file for a complete monitoring stack example with Prometheus, Grafana, and puff-exporter.
 
 ## Using the Dashboard
 
@@ -223,7 +223,7 @@ The `by (region)` groups results by the region label.
    - Verify target is "UP" and last scrape was recent
 
 2. **Exporter not running**
-   - Check if the tpuff exporter is running: `curl http://localhost:9876/health`
+   - Check if the puff exporter is running: `curl http://localhost:9876/health`
    - Should return JSON with `{"status": "ok"}`
    - If not, start the exporter: `TURBOPUFFER_API_KEY=your_key npm run dev -- export`
 
@@ -236,7 +236,7 @@ The `by (region)` groups results by the region label.
    - Should return Prometheus metrics in text format
 
 5. **No namespaces exist**
-   - Check if you have any Turbopuffer namespaces: `tpuff list`
+   - Check if you have any Turbopuffer namespaces: `puff list`
    - Create a test namespace if needed
 
 **Troubleshooting steps:**
@@ -381,7 +381,7 @@ groups:
           service: turbopuffer
         annotations:
           summary: "Turbopuffer exporter is down"
-          description: "The tpuff Prometheus exporter has been down for more than 5 minutes."
+          description: "The puff Prometheus exporter has been down for more than 5 minutes."
 ```
 
 Load the rules in Prometheus:
@@ -440,7 +440,7 @@ After making changes:
 
 ### Available Metrics
 
-All metrics from the tpuff exporter:
+All metrics from the puff exporter:
 
 | Metric | Type | Labels | Description |
 |--------|------|--------|-------------|
@@ -462,12 +462,12 @@ All metrics from the tpuff exporter:
 ## Support
 
 For issues with:
-- **This dashboard**: Open an issue in the tpuff repository
-- **The tpuff exporter**: See `DOCKER.md` and the main README
+- **This dashboard**: Open an issue in the puff repository
+- **The puff exporter**: See `DOCKER.md` and the main README
 - **Turbopuffer service**: Contact Turbopuffer support
 - **Grafana**: See [Grafana documentation](https://grafana.com/docs/)
 - **Prometheus**: See [Prometheus documentation](https://prometheus.io/docs/)
 
 ## License
 
-This dashboard is part of the tpuff CLI project. See the main repository for license information.
+This dashboard is part of the puff CLI project. See the main repository for license information.

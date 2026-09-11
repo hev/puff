@@ -1,13 +1,9 @@
 .PHONY: build install clean test vet lint docker help
+.DEFAULT_GOAL := build
 
-BINARY := tpuff
-ALIAS  := tpuf
-BINDIR := $(shell go env GOBIN)
-ifeq ($(BINDIR),)
-BINDIR := $(shell go env GOPATH)/bin
-endif
+BINARY := puff
 
-DOCKER_IMAGE ?= hevmind/tpuff-exporter
+DOCKER_IMAGE ?= hevmind/puff-exporter
 DOCKER_TAG   ?= dev
 
 build:
@@ -15,7 +11,6 @@ build:
 
 install:
 	go install .
-	ln -sf $(BINARY) $(BINDIR)/$(ALIAS)
 
 test:
 	go test ./... -race -count=1
@@ -34,8 +29,8 @@ clean:
 
 help:
 	@echo "Available targets:"
-	@echo "  build      - Build the tpuff binary"
-	@echo "  install    - Install to GOPATH/bin (also links tpuf -> tpuff)"
+	@echo "  build      - Build the puff binary"
+	@echo "  install    - Install to GOPATH/bin"
 	@echo "  test       - Run unit tests with race detector"
 	@echo "  vet        - Run go vet"
 	@echo "  lint       - Run golangci-lint"
