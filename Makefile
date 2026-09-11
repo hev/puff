@@ -1,10 +1,13 @@
-.PHONY: build install clean test vet lint docker help
+.PHONY: build install clean test vet lint docker help check-layer-ui
 .DEFAULT_GOAL := build
 
 BINARY := puff
 
 DOCKER_IMAGE ?= hevmind/puff-exporter
 DOCKER_TAG   ?= dev
+
+check-layer-ui:
+	python3 scripts/check-layer-ui.py
 
 build:
 	go build -o $(BINARY) .

@@ -30,3 +30,7 @@ coverage.html
 .agent/
 .beads/
 .claude/
+
+# Imported search UI stays local until its redistribution is approved.
+/internal/searchapp/assets/*
+!/internal/searchapp/assets/NOTICE.txt

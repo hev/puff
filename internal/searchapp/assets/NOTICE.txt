@@ -1,0 +1,3 @@
+Search UI runtime assets are supplied by hev/layer-ui.
+This integration does not yet include a publicly redistributable UI bundle.
+For development, build the shared runtime and pass its directory to --ui-dir.

@@ -4,6 +4,7 @@ project_name: puff
 
 before:
   hooks:
+    - python3 scripts/check-layer-ui.py
     - go mod tidy
 
 builds:

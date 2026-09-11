@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/hev/puff/internal/config"
@@ -66,6 +67,13 @@ func GetClient(regionOverride string) (*turbopuffer.Client, error) {
 	}
 	if baseURL != "" {
 		opts = append(opts, option.WithBaseURL(baseURL))
+		// The SDK also reads TURBOPUFFER_REGION itself. A concrete endpoint
+		// rejects that region unless its URL contains the REGION placeholder.
+		if strings.Contains(baseURL, "REGION") {
+			opts = append(opts, option.WithRegion(region))
+		} else {
+			opts = append(opts, option.WithRegion(""))
+		}
 	} else {
 		opts = append(opts, option.WithRegion(region))
 	}
